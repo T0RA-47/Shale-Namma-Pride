@@ -4,10 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,22 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.shalenammapride.R
 import com.shalenammapride.ui.components.FullScreenImageDialog
 import com.shalenammapride.ui.theme.*
 import com.shalenammapride.util.AppStrings
-
-// Add your Google Drive / Google Photos direct image URLs here
-private val schoolPhotoUrls = listOf<String>(
-    // Paste your direct image URLs here, e.g.:
-    // "https://drive.google.com/uc?export=view&id=YOUR_FILE_ID",
-)
 
 @Composable
 fun SchoolInfoScreen(strings: AppStrings) {
@@ -68,29 +58,6 @@ fun SchoolInfoScreen(strings: AppStrings) {
                     Text(text = "DICIMUS CONSEQUIMUR", style = MaterialTheme.typography.labelMedium, color = PureWhite.copy(alpha = 0.75f))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = strings.buildingTrust, style = MaterialTheme.typography.bodyMedium, color = PureWhite.copy(alpha = 0.85f))
-                }
-            }
-        }
-
-        if (schoolPhotoUrls.isNotEmpty()) {
-            item {
-                Text(text = "School Gallery", style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    schoolPhotoUrls.forEach { url ->
-                        AsyncImage(
-                            model = url,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(140.dp, 100.dp).clip(RoundedCornerShape(10.dp))
-                                .clickable { fullScreenUrl = url }
-                        )
-                    }
                 }
             }
         }
