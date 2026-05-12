@@ -1,4 +1,4 @@
-﻿package com.shalenammapride.ui.screens.reports
+package com.shalenammapride.ui.screens.reports
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shalenammapride.data.repository.AchievementRepository
 import com.shalenammapride.data.repository.FacilityRepository
 import com.shalenammapride.data.repository.FeedbackRepository
@@ -34,18 +33,10 @@ fun ReportsScreen(strings: AppStrings) {
     var achievementCount by remember { mutableStateOf(0) }
     var feedbackCount by remember { mutableStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        mealRepo.getMeals().collect { mealCount = it.size }
-    }
-    LaunchedEffect(Unit) {
-        facilityRepo.getFacilities().collect { facilityCount = it.size }
-    }
-    LaunchedEffect(Unit) {
-        achievementRepo.getAchievements().collect { achievementCount = it.size }
-    }
-    LaunchedEffect(Unit) {
-        feedbackRepo.getFeedback().collect { feedbackCount = it.size }
-    }
+    LaunchedEffect(Unit) { mealRepo.getMeals().collect { mealCount = it.size } }
+    LaunchedEffect(Unit) { facilityRepo.getFacilities().collect { facilityCount = it.size } }
+    LaunchedEffect(Unit) { achievementRepo.getAchievements().collect { achievementCount = it.size } }
+    LaunchedEffect(Unit) { feedbackRepo.getFeedback().collect { feedbackCount = it.size } }
 
     val reportText = """
 *Shale - Namma Pride School Report*
@@ -61,7 +52,7 @@ _Shared via Shale - Namma Pride App_
     """.trimIndent()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().background(LightGray),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -70,19 +61,13 @@ _Shared via Shale - Namma Pride App_
         }
 
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(modifier = Modifier.weight(1f), label = strings.meals, count = mealCount, icon = Icons.Filled.Restaurant)
                 StatCard(modifier = Modifier.weight(1f), label = strings.facilities, count = facilityCount, icon = Icons.Filled.School)
             }
         }
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard(modifier = Modifier.weight(1f), label = strings.achievements, count = achievementCount, icon = Icons.Filled.Star)
                 StatCard(modifier = Modifier.weight(1f), label = strings.feedback, count = feedbackCount, icon = Icons.Filled.Feedback)
             }
@@ -95,7 +80,7 @@ _Shared via Shale - Namma Pride App_
                     Text(
                         text = "Share a summary of school activities with parents and community via WhatsApp.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MediumText
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Button(
                         onClick = {
@@ -106,8 +91,7 @@ _Shared via Shale - Namma Pride App_
                             }
                             runCatching { context.startActivity(intent) }.onFailure {
                                 val fallback = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, reportText)
+                                    type = "text/plain"; putExtra(Intent.EXTRA_TEXT, reportText)
                                 }
                                 context.startActivity(Intent.createChooser(fallback, strings.share))
                             }
@@ -133,14 +117,11 @@ private fun StatCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector
 ) {
     ShaleCard(modifier = modifier) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, contentDescription = null, tint = Saffron, modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = count.toString(), style = MaterialTheme.typography.headlineLarge, color = Saffron)
-            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MediumText)
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿package com.shalenammapride.ui.screens.feedback
+package com.shalenammapride.ui.screens.feedback
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -40,7 +40,7 @@ fun FeedbackScreen(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().background(LightGray),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -50,39 +50,23 @@ fun FeedbackScreen(
                     Text(text = strings.feedback, style = MaterialTheme.typography.headlineSmall, color = Saffron)
 
                     if (!isAnonymous) {
-                        OutlinedTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            label = { Text(strings.yourName) },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
-                        )
+                        OutlinedTextField(value = name, onValueChange = { name = it },
+                            label = { Text(strings.yourName) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                     }
 
-                    OutlinedTextField(
-                        value = message,
-                        onValueChange = { message = it },
-                        label = { Text(strings.yourMessage) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 4
-                    )
+                    OutlinedTextField(value = message, onValueChange = { message = it },
+                        label = { Text(strings.yourMessage) }, modifier = Modifier.fillMaxWidth(), minLines = 4)
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = isAnonymous,
-                            onCheckedChange = { isAnonymous = it },
-                            colors = CheckboxDefaults.colors(checkedColor = Saffron)
-                        )
+                        Checkbox(checked = isAnonymous, onCheckedChange = { isAnonymous = it },
+                            colors = CheckboxDefaults.colors(checkedColor = Saffron))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = strings.submitAnonymously, style = MaterialTheme.typography.bodyMedium)
+                        Text(text = strings.submitAnonymously, style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface)
                     }
 
                     if (showSuccess) {
-                        Text(
-                            text = strings.feedbackSubmitted,
-                            color = IndiaGreen,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Text(text = strings.feedbackSubmitted, color = IndiaGreen, style = MaterialTheme.typography.bodyMedium)
                     }
 
                     ShaleButton(
@@ -96,15 +80,14 @@ fun FeedbackScreen(
 
         if (isAdmin && uiState.feedbackList.isNotEmpty()) {
             item {
-                Text(text = "Submitted Feedback (${uiState.feedbackList.size})", style = MaterialTheme.typography.headlineSmall)
+                Text(text = "Submitted Feedback (${uiState.feedbackList.size})",
+                    style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
             }
             items(uiState.feedbackList) { fb ->
                 ShaleCard {
                     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
-                        Box(
-                            modifier = Modifier.size(40.dp).clip(CircleShape).background(SaffronLight),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(SaffronLight),
+                            contentAlignment = Alignment.Center) {
                             Icon(Icons.Filled.Person, contentDescription = null, tint = Saffron)
                         }
                         Spacer(modifier = Modifier.width(12.dp))
@@ -112,10 +95,12 @@ fun FeedbackScreen(
                             Text(
                                 text = if (fb.isAnonymous || fb.userName.isEmpty()) "Anonymous" else fb.userName,
                                 style = MaterialTheme.typography.titleLarge,
-                                color = DarkText
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            Text(text = fb.message, style = MaterialTheme.typography.bodyMedium, color = MediumText)
-                            Text(text = fb.submittedDate, style = MaterialTheme.typography.labelMedium, color = LightText)
+                            Text(text = fb.message, style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = fb.submittedDate, style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         IconButton(onClick = { viewModel.deleteFeedback(fb.id) }) {
                             Icon(Icons.Filled.Delete, contentDescription = strings.delete, tint = ErrorRed)

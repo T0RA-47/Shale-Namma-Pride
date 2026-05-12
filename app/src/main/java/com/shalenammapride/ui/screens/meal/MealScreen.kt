@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.ThumbDown
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
@@ -67,13 +69,12 @@ fun MealScreen(
                 uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxSize())
                 uiState.meals.isEmpty() -> EmptyState(message = strings.noMealsToday, modifier = Modifier.fillMaxSize())
                 else -> LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(uiState.meals) { meal ->
+                        val reaction = uiState.reactionData[meal.id] ?: ReactionSummary()
                         ShaleCard {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row(
@@ -123,28 +124,44 @@ fun MealScreen(
                                     Spacer(modifier = Modifier.height(8.dp))
                                     NetworkImage(
                                         url = meal.photoUrl,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp)
-                                            .clip(RoundedCornerShape(8.dp))
+                                        modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(8.dp))
                                             .clickable { fullScreenUrl = meal.photoUrl }
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(text = meal.menuDescription, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(text = "${strings.date}: ${meal.uploadDate}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        IconButton(onClick = { viewModel.reactToMeal(meal.id) }, modifier = Modifier.size(32.dp)) {
-                                            Icon(Icons.Filled.Favorite, contentDescription = strings.likes, tint = ErrorRed, modifier = Modifier.size(18.dp))
+
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                        IconButton(onClick = { viewModel.react(meal.id, "up") }, modifier = Modifier.size(36.dp)) {
+                                            Icon(
+                                                if (reaction.myVote == "up") Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
+                                                contentDescription = "Like",
+                                                tint = if (reaction.myVote == "up") IndiaGreen else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(20.dp)
+                                            )
                                         }
-                                        if (meal.likes > 0) {
-                                            Text(text = "${meal.likes}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        if (reaction.ups > 0) {
+                                            Text("${reaction.ups}", style = MaterialTheme.typography.labelMedium, color = if (reaction.myVote == "up") IndiaGreen else MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        IconButton(onClick = { viewModel.react(meal.id, "down") }, modifier = Modifier.size(36.dp)) {
+                                            Icon(
+                                                if (reaction.myVote == "down") Icons.Filled.ThumbDown else Icons.Outlined.ThumbDown,
+                                                contentDescription = "Dislike",
+                                                tint = if (reaction.myVote == "down") ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        if (reaction.downs > 0) {
+                                            Text("${reaction.downs}", style = MaterialTheme.typography.labelMedium, color = if (reaction.myVote == "down") ErrorRed else MaterialTheme.colorScheme.onSurfaceVariant)
                                         }
                                     }
                                 }
