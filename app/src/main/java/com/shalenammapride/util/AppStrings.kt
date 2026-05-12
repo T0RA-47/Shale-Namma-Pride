@@ -1,4 +1,4 @@
-﻿package com.shalenammapride.util
+package com.shalenammapride.util
 
 data class AppStrings(
     val appName: String,
@@ -70,6 +70,20 @@ data class AppStrings(
     val lunch: String,
     val snack: String,
     val dinner: String,
+    // School info
+    val schoolInfo: String,
+    val aboutSchool: String,
+    val founded: String,
+    val founders: String,
+    val principal: String,
+    val schoolType: String,
+    val grades: String,
+    val address: String,
+    val phone: String,
+    // Features
+    val darkMode: String,
+    val likes: String,
+    val tapToView: String,
 )
 
 val EnglishStrings = AppStrings(
@@ -142,6 +156,18 @@ val EnglishStrings = AppStrings(
     lunch = "Lunch",
     snack = "Snack",
     dinner = "Dinner",
+    schoolInfo = "School Info",
+    aboutSchool = "About Our School",
+    founded = "Founded",
+    founders = "Founders",
+    principal = "Principal",
+    schoolType = "School Type",
+    grades = "Classes",
+    address = "Address",
+    phone = "Phone",
+    darkMode = "Dark Mode",
+    likes = "Likes",
+    tapToView = "Tap to view full screen",
 )
 
 val KannadaStrings = AppStrings(
@@ -214,4 +240,16 @@ val KannadaStrings = AppStrings(
     lunch = "ಮಧ್ಯಾಹ್ನದ ಊಟ",
     snack = "ತಿಂಡಿ",
     dinner = "ರಾತ್ರಿ ಊಟ",
+    schoolInfo = "ಶಾಲೆ ಮಾಹಿತಿ",
+    aboutSchool = "ನಮ್ಮ ಶಾಲೆಯ ಬಗ್ಗೆ",
+    founded = "ಸ್ಥಾಪಿತ",
+    founders = "ಸ್ಥಾಪಕರು",
+    principal = "ಮುಖ್ಯಾಧ್ಯಾಪಕರು",
+    schoolType = "ಶಾಲೆ ಪ್ರಕಾರ",
+    grades = "ತರಗತಿಗಳು",
+    address = "ವಿಳಾಸ",
+    phone = "ಫೋನ್",
+    darkMode = "ಡಾರ್ಕ್ ಮೋಡ್",
+    likes = "ಇಷ್ಟಗಳು",
+    tapToView = "ಪೂರ್ಣ ಪರದೆಯಲ್ಲಿ ನೋಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
 )

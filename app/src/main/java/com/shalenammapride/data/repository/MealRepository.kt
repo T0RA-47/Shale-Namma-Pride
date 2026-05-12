@@ -3,6 +3,7 @@ package com.shalenammapride.data.repository
 import android.net.Uri
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -32,6 +33,12 @@ class MealRepository {
         awaitClose { db.removeEventListener(listener) }
     }
 
+    suspend fun uploadMealImage(imageBytes: ByteArray): String {
+        val ref = storage.child("${UUID.randomUUID()}.jpg")
+        ref.putBytes(imageBytes).await()
+        return ref.downloadUrl.await().toString()
+    }
+
     suspend fun uploadMealImage(uri: Uri): String {
         val ref = storage.child("${UUID.randomUUID()}.jpg")
         ref.putFile(uri).await()
@@ -41,6 +48,10 @@ class MealRepository {
     suspend fun addMeal(meal: MealUpdate): Result<Unit> = runCatching {
         val key = db.push().key ?: UUID.randomUUID().toString()
         db.child(key).setValue(meal.copy(id = key)).await()
+    }
+
+    suspend fun incrementLikes(id: String) {
+        db.child(id).updateChildren(mapOf("likes" to ServerValue.increment(1))).await()
     }
 
     suspend fun deleteMeal(id: String): Result<Unit> = runCatching {

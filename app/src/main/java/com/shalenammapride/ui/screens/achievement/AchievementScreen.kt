@@ -1,23 +1,26 @@
-﻿package com.shalenammapride.ui.screens.achievement
+package com.shalenammapride.ui.screens.achievement
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shalenammapride.ui.components.*
@@ -33,15 +36,16 @@ fun AchievementScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var fullScreenUrl by remember { mutableStateOf<String?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.uploadSuccess) {
         if (uiState.uploadSuccess) { showAddDialog = false; viewModel.clearSuccess() }
     }
-
     LaunchedEffect(uiState.error) {
-        uiState.error?.let { error ->
-            snackbarHostState.showSnackbar(message = "Upload failed: $error", duration = SnackbarDuration.Long)
+        uiState.error?.let {
+            snackbarHostState.showSnackbar(message = "Upload failed: $it", duration = SnackbarDuration.Long)
             viewModel.clearError()
         }
     }
@@ -56,80 +60,81 @@ fun AchievementScreen(
             }
         }
     ) { padding ->
-        if (uiState.isLoading) {
-            LoadingState(modifier = Modifier.padding(padding))
-        } else if (uiState.achievements.isEmpty()) {
-            EmptyState(message = strings.noAchievements, modifier = Modifier.padding(padding))
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().background(LightGray).padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(uiState.achievements) { achievement ->
-                    ShaleCard {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                if (achievement.photoUrl.isNotEmpty()) {
-                                    NetworkImage(
-                                        url = achievement.photoUrl,
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .clip(CircleShape)
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .clip(CircleShape)
-                                            .background(SaffronLight),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(Icons.Filled.Star, contentDescription = null, tint = Saffron, modifier = Modifier.size(36.dp))
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                }
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = achievement.studentName,
-                                                style = MaterialTheme.typography.titleLarge,
-                                                color = DarkText
-                                            )
-                                            Text(
-                                                text = achievement.achievementTitle,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                color = Saffron
-                                            )
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = { viewModel.refresh() },
+            modifier = Modifier.fillMaxSize().padding(padding)
+        ) {
+            when {
+                uiState.isLoading -> LoadingState(modifier = Modifier.fillMaxSize())
+                uiState.achievements.isEmpty() -> EmptyState(message = strings.noAchievements, modifier = Modifier.fillMaxSize())
+                else -> LazyColumn(
+                    modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.achievements) { achievement ->
+                        ShaleCard {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                                    if (achievement.photoUrl.isNotEmpty()) {
+                                        NetworkImage(
+                                            url = achievement.photoUrl,
+                                            modifier = Modifier
+                                                .size(80.dp)
+                                                .clip(CircleShape)
+                                                .clickable { fullScreenUrl = achievement.photoUrl }
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                    } else {
+                                        Box(
+                                            modifier = Modifier.size(80.dp).clip(CircleShape).background(SaffronLight),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(Icons.Filled.Star, contentDescription = null, tint = Saffron, modifier = Modifier.size(36.dp))
                                         }
-                                        if (isAdmin) {
-                                            IconButton(onClick = { viewModel.deleteAchievement(achievement.id) }) {
-                                                Icon(Icons.Filled.Delete, contentDescription = strings.delete, tint = ErrorRed)
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(text = achievement.studentName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+                                                Text(text = achievement.achievementTitle, style = MaterialTheme.typography.bodyLarge, color = Saffron)
+                                            }
+                                            Row {
+                                                IconButton(onClick = {
+                                                    val text = "${achievement.studentName} — ${achievement.achievementTitle}\n${strings.date}: ${achievement.achievementDate}\n— ${strings.appName}"
+                                                    context.startActivity(Intent.createChooser(
+                                                        Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) },
+                                                        strings.share
+                                                    ))
+                                                }) {
+                                                    Icon(Icons.Filled.Share, contentDescription = strings.share, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                                }
+                                                if (isAdmin) {
+                                                    IconButton(onClick = { viewModel.deleteAchievement(achievement.id) }) {
+                                                        Icon(Icons.Filled.Delete, contentDescription = strings.delete, tint = ErrorRed)
+                                                    }
+                                                }
                                             }
                                         }
+                                        if (achievement.description.isNotEmpty()) {
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(text = achievement.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                        Text(text = achievement.achievementDate, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
-                                    if (achievement.description.isNotEmpty()) {
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(text = achievement.description, style = MaterialTheme.typography.bodyMedium, color = MediumText)
-                                    }
-                                    Text(text = achievement.achievementDate, style = MaterialTheme.typography.labelMedium, color = LightText)
                                 }
                             }
                         }
                     }
+                    item { Spacer(modifier = Modifier.height(72.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(72.dp)) }
             }
         }
     }
+
+    fullScreenUrl?.let { FullScreenImageDialog(url = it, onDismiss = { fullScreenUrl = null }) }
 
     if (showAddDialog) {
         AddAchievementDialog(
@@ -152,7 +157,6 @@ private fun AddAchievementDialog(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
-
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> selectedUri = uri }
 
     AlertDialog(
@@ -160,16 +164,10 @@ private fun AddAchievementDialog(
         title = { Text(strings.addAchievement) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(value = studentName, onValueChange = { studentName = it },
-                    label = { Text(strings.studentName) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = title, onValueChange = { title = it },
-                    label = { Text(strings.achievementTitle) }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = description, onValueChange = { description = it },
-                    label = { Text(strings.achievementDescription) }, modifier = Modifier.fillMaxWidth(), minLines = 2)
-                ShaleOutlinedButton(
-                    text = if (selectedUri != null) "✓ ${strings.uploadPhoto}" else strings.uploadPhoto,
-                    onClick = { imagePicker.launch("image/*") }
-                )
+                OutlinedTextField(value = studentName, onValueChange = { studentName = it }, label = { Text(strings.studentName) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text(strings.achievementTitle) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text(strings.achievementDescription) }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+                ShaleOutlinedButton(text = if (selectedUri != null) "✓ ${strings.uploadPhoto}" else strings.uploadPhoto, onClick = { imagePicker.launch("image/*") })
                 if (isUploading) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Saffron)
@@ -179,13 +177,7 @@ private fun AddAchievementDialog(
                 }
             }
         },
-        confirmButton = {
-            ShaleButton(
-                text = strings.submit,
-                onClick = { onSubmit(selectedUri, studentName, title, description) },
-                enabled = studentName.isNotBlank() && title.isNotBlank() && !isUploading
-            )
-        },
+        confirmButton = { ShaleButton(text = strings.submit, onClick = { onSubmit(selectedUri, studentName, title, description) }, enabled = studentName.isNotBlank() && title.isNotBlank() && !isUploading) },
         dismissButton = { TextButton(onClick = onDismiss, enabled = !isUploading) { Text(strings.cancel) } }
     )
 }

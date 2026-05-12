@@ -32,6 +32,12 @@ class AchievementRepository {
         awaitClose { db.removeEventListener(listener) }
     }
 
+    suspend fun uploadImage(imageBytes: ByteArray): String {
+        val ref = storage.child("${UUID.randomUUID()}.jpg")
+        ref.putBytes(imageBytes).await()
+        return ref.downloadUrl.await().toString()
+    }
+
     suspend fun uploadImage(uri: Uri): String {
         val ref = storage.child("${UUID.randomUUID()}.jpg")
         ref.putFile(uri).await()

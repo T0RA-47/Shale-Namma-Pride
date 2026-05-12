@@ -1,4 +1,4 @@
-﻿package com.shalenammapride.ui.theme
+package com.shalenammapride.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -17,3 +17,11 @@ val LightText = Color(0xFF888888)
 val ErrorRed = Color(0xFFD32F2F)
 val NavyBlue = Color(0xFF000080)
 val CardBorder = Color(0xFFE0D5C5)
+
+// Dark theme
+val NightBackground = Color(0xFF121212)
+val NightSurface = Color(0xFF1E1E1E)
+val NightSurfaceVariant = Color(0xFF2D2D2D)
+val NightText = Color(0xFFE8E8E8)
+val NightTextMedium = Color(0xFFAAAAAA)
+val NightCardBorder = Color(0xFF333333)

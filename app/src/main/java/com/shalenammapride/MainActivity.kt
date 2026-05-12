@@ -1,4 +1,4 @@
-﻿package com.shalenammapride
+package com.shalenammapride
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -28,19 +28,27 @@ class MainActivity : ComponentActivity() {
             var isKannada by remember {
                 mutableStateOf(runBlocking { languageManager.isKannada.first() })
             }
+            var isDarkMode by remember {
+                mutableStateOf(runBlocking { languageManager.isDarkMode.first() })
+            }
 
             LaunchedEffect(Unit) {
                 languageManager.isKannada.collect { isKannada = it }
             }
+            LaunchedEffect(Unit) {
+                languageManager.isDarkMode.collect { isDarkMode = it }
+            }
 
-            ShaleNammaPrideTheme {
+            ShaleNammaPrideTheme(darkTheme = isDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     ShaleNavGraph(
                         isKannada = isKannada,
+                        isDarkMode = isDarkMode,
                         onLanguageToggle = {
-                            lifecycleScope.launch {
-                                languageManager.setKannada(!isKannada)
-                            }
+                            lifecycleScope.launch { languageManager.setKannada(!isKannada) }
+                        },
+                        onDarkModeToggle = {
+                            lifecycleScope.launch { languageManager.setDarkMode(!isDarkMode) }
                         }
                     )
                 }

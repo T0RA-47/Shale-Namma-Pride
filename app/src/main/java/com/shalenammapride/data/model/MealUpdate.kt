@@ -6,6 +6,7 @@ data class MealUpdate(
     val menuDescription: String = "",
     val mealType: String = "",
     val mealTime: String = "",
+    val likes: Long = 0L,
     val uploadDate: String = "",
     val uploadedBy: String = ""
 )
