@@ -63,6 +63,13 @@ data class AppStrings(
     val recentUpdates: String,
     val schoolActivities: String,
     val buildingTrust: String,
+    val mealType: String,
+    val mealTime: String,
+    val mealTimeOptional: String,
+    val breakfast: String,
+    val lunch: String,
+    val snack: String,
+    val dinner: String,
 )
 
 val EnglishStrings = AppStrings(
@@ -128,6 +135,13 @@ val EnglishStrings = AppStrings(
     recentUpdates = "Recent Updates",
     schoolActivities = "School Activities",
     buildingTrust = "Building trust through transparency",
+    mealType = "Meal Type",
+    mealTime = "Time",
+    mealTimeOptional = "Time (Optional, e.g. 12:30 PM)",
+    breakfast = "Breakfast",
+    lunch = "Lunch",
+    snack = "Snack",
+    dinner = "Dinner",
 )
 
 val KannadaStrings = AppStrings(
@@ -193,4 +207,11 @@ val KannadaStrings = AppStrings(
     recentUpdates = "ಇತ್ತೀಚಿನ ನವೀಕರಣಗಳು",
     schoolActivities = "ಶಾಲಾ ಚಟುವಟಿಕೆಗಳು",
     buildingTrust = "ಪಾರದರ್ಶಕತೆಯ ಮೂಲಕ ವಿಶ್ವಾಸ ಮೂಡಿಸುವುದು",
+    mealType = "ಊಟದ ಪ್ರಕಾರ",
+    mealTime = "ಸಮಯ",
+    mealTimeOptional = "ಸಮಯ (ಐಚ್ಛಿಕ, ಉದಾ: 12:30 PM)",
+    breakfast = "ಉಪಾಹಾರ",
+    lunch = "ಮಧ್ಯಾಹ್ನದ ಊಟ",
+    snack = "ತಿಂಡಿ",
+    dinner = "ರಾತ್ರಿ ಊಟ",
 )

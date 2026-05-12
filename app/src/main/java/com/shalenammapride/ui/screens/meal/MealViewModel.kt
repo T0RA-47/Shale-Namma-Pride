@@ -31,7 +31,7 @@ class MealViewModel : ViewModel() {
         }
     }
 
-    fun uploadMeal(imageUri: Uri, menuDescription: String) {
+    fun uploadMeal(imageUri: Uri, menuDescription: String, mealType: String, mealTime: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isUploading = true, error = null) }
             runCatching {
@@ -40,6 +40,8 @@ class MealViewModel : ViewModel() {
                 val meal = MealUpdate(
                     photoUrl = imageUrl,
                     menuDescription = menuDescription,
+                    mealType = mealType,
+                    mealTime = mealTime,
                     uploadDate = today,
                     uploadedBy = "Admin"
                 )
@@ -52,12 +54,14 @@ class MealViewModel : ViewModel() {
         }
     }
 
-    fun addMealWithoutImage(menuDescription: String) {
+    fun addMealWithoutImage(menuDescription: String, mealType: String, mealTime: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isUploading = true, error = null) }
             val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             val meal = MealUpdate(
                 menuDescription = menuDescription,
+                mealType = mealType,
+                mealTime = mealTime,
                 uploadDate = today,
                 uploadedBy = "Admin"
             )
