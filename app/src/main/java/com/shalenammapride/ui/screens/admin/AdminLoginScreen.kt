@@ -44,7 +44,7 @@ fun AdminLoginScreen(
                 .padding(32.dp),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(containerColor = PureWhite)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(
                 modifier = Modifier.padding(28.dp),
@@ -92,7 +92,7 @@ fun AdminLoginScreen(
                     Text(strings.adminLogin, style = MaterialTheme.typography.labelLarge)
                 }
                 TextButton(onClick = onBack) {
-                    Text(strings.cancel, color = MediumText)
+                    Text(strings.cancel, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }

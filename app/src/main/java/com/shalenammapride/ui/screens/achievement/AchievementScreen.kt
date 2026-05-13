@@ -78,8 +78,6 @@ fun AchievementScreen(
                 ) {
                     items(uiState.achievements) { achievement ->
                         val reaction = uiState.reactionData[achievement.id] ?: AchievementLikeSummary()
-                        val commentCount = if (uiState.commentsState.achievementId == achievement.id)
-                            uiState.commentsState.comments.size else 0
 
                         ShaleCard {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -162,7 +160,7 @@ fun AchievementScreen(
                                     }
                                     Spacer(modifier = Modifier.width(16.dp))
                                     IconButton(onClick = { viewModel.openComments(achievement.id) }, modifier = Modifier.size(36.dp)) {
-                                        Icon(Icons.Filled.ChatBubbleOutline, contentDescription = strings.comments,
+                                        Icon(Icons.Filled.Comment, contentDescription = strings.comments,
                                             tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                                     }
                                     Text(strings.comments, style = MaterialTheme.typography.labelMedium,

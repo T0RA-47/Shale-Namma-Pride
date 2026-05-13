@@ -34,12 +34,6 @@ fun AdminScreen(
     LaunchedEffect(uiState.submitSuccess) {
         if (uiState.submitSuccess) { showAddAnnouncementDialog = false; viewModel.clearSuccess() }
     }
-    LaunchedEffect(uiState.notificationSent) {
-        if (uiState.notificationSent) {
-            snackbarHostState.showSnackbar("Announcement posted & notification sent!")
-            viewModel.clearNotification()
-        }
-    }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
         LazyColumn(
@@ -59,7 +53,7 @@ fun AdminScreen(
                                 Text("Logout", color = ErrorRed)
                             }
                         }
-                        Text(text = "Manage school announcements below. A push notification is sent to all users when you post.",
+                        Text(text = "Manage school announcements. Use Firebase Console → Cloud Messaging to notify all parents.",
                             style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }

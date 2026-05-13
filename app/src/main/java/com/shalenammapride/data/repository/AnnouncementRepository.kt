@@ -7,25 +7,16 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.shalenammapride.data.model.Announcement
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
 
 class AnnouncementRepository {
     private val db = Firebase.database.reference.child("announcements")
     private val storage = Firebase.storage.reference.child("announcements")
     private val reactionsRef = Firebase.database.reference.child("announcement_reactions")
-
-    // Get from Firebase Console → Project Settings → Cloud Messaging → Server key (Legacy)
-    private companion object {
-        const val FCM_SERVER_KEY = "YOUR_FCM_SERVER_KEY_HERE"
-    }
 
     fun getAnnouncements(): Flow<List<Announcement>> = callbackFlow {
         val listener = object : ValueEventListener {
@@ -77,25 +68,6 @@ class AnnouncementRepository {
     suspend fun addAnnouncement(announcement: Announcement): Result<Unit> = runCatching {
         val key = db.push().key ?: UUID.randomUUID().toString()
         db.child(key).setValue(announcement.copy(id = key)).await()
-    }
-
-    suspend fun sendNotification(title: String, body: String) {
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val url = URL("https://fcm.googleapis.com/fcm/send")
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "POST"
-                conn.setRequestProperty("Authorization", "key=$FCM_SERVER_KEY")
-                conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
-                conn.doOutput = true
-                val safeTitle = title.replace("\"", "'")
-                val safeBody = body.replace("\"", "'").ifEmpty { "New announcement from school" }
-                val payload = """{"to":"/topics/school_updates","notification":{"title":"$safeTitle","body":"$safeBody","sound":"default"},"priority":"high"}"""
-                conn.outputStream.bufferedWriter(Charsets.UTF_8).use { it.write(payload) }
-                conn.responseCode
-                conn.disconnect()
-            }
-        }
     }
 
     suspend fun deleteAnnouncement(id: String): Result<Unit> = runCatching {

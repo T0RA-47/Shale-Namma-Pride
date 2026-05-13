@@ -17,7 +17,6 @@ data class AdminUiState(
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
     val submitSuccess: Boolean = false,
-    val notificationSent: Boolean = false,
     val error: String? = null
 )
 
@@ -45,9 +44,8 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
                 val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 val ann = Announcement(title = title, description = description, imageUrl = imageUrl, postedDate = today)
                 announcementRepo.addAnnouncement(ann).getOrThrow()
-                announcementRepo.sendNotification(title, description)
             }.onSuccess {
-                _uiState.update { it.copy(isSubmitting = false, submitSuccess = true, notificationSent = true) }
+                _uiState.update { it.copy(isSubmitting = false, submitSuccess = true) }
             }.onFailure { e ->
                 _uiState.update { it.copy(isSubmitting = false, error = e.message) }
             }
@@ -59,5 +57,4 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearSuccess() { _uiState.update { it.copy(submitSuccess = false) } }
-    fun clearNotification() { _uiState.update { it.copy(notificationSent = false) } }
 }

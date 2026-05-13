@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ fun SchoolInfoScreen(strings: AppStrings) {
                     .background(Brush.horizontalGradient(listOf(Saffron, SaffronDark))).padding(20.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    androidx.compose.foundation.Image(
+                    Image(
                         painter = painterResource(id = R.drawable.school_logo),
                         contentDescription = "School Logo",
                         modifier = Modifier.size(100.dp).clip(CircleShape)
