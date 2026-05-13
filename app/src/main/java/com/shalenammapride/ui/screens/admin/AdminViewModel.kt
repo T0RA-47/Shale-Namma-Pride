@@ -1,9 +1,12 @@
-﻿package com.shalenammapride.ui.screens.admin
+package com.shalenammapride.ui.screens.admin
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.shalenammapride.data.model.Announcement
 import com.shalenammapride.data.repository.AnnouncementRepository
+import com.shalenammapride.util.ImageUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -14,10 +17,11 @@ data class AdminUiState(
     val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
     val submitSuccess: Boolean = false,
+    val notificationSent: Boolean = false,
     val error: String? = null
 )
 
-class AdminViewModel : ViewModel() {
+class AdminViewModel(application: Application) : AndroidViewModel(application) {
     private val announcementRepo = AnnouncementRepository()
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()
@@ -30,14 +34,23 @@ class AdminViewModel : ViewModel() {
         }
     }
 
-    fun addAnnouncement(title: String, description: String) {
+    fun addAnnouncement(title: String, description: String, imageUri: Uri?) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isSubmitting = true) }
-            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-            val ann = Announcement(title = title, description = description, postedDate = today)
-            announcementRepo.addAnnouncement(ann)
-                .onSuccess { _uiState.update { it.copy(isSubmitting = false, submitSuccess = true) } }
-                .onFailure { e -> _uiState.update { it.copy(isSubmitting = false, error = e.message) } }
+            _uiState.update { it.copy(isSubmitting = true, error = null) }
+            runCatching {
+                val imageUrl = if (imageUri != null) {
+                    val bytes = ImageUtils.compress(getApplication(), imageUri)
+                    announcementRepo.uploadImage(bytes)
+                } else ""
+                val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val ann = Announcement(title = title, description = description, imageUrl = imageUrl, postedDate = today)
+                announcementRepo.addAnnouncement(ann).getOrThrow()
+                announcementRepo.sendNotification(title, description)
+            }.onSuccess {
+                _uiState.update { it.copy(isSubmitting = false, submitSuccess = true, notificationSent = true) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(isSubmitting = false, error = e.message) }
+            }
         }
     }
 
@@ -46,4 +59,5 @@ class AdminViewModel : ViewModel() {
     }
 
     fun clearSuccess() { _uiState.update { it.copy(submitSuccess = false) } }
+    fun clearNotification() { _uiState.update { it.copy(notificationSent = false) } }
 }

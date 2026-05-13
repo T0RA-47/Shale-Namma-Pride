@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.shalenammapride.data.model.Announcement
 import com.shalenammapride.ui.components.NetworkImage
 import com.shalenammapride.ui.components.ShaleCard
 import com.shalenammapride.ui.navigation.Screen
@@ -32,6 +33,7 @@ fun HomeScreen(
     val latestMeal by viewModel.latestMeal.collectAsState()
     val latestAchievement by viewModel.latestAchievement.collectAsState()
     val announcements by viewModel.announcements.collectAsState()
+    val announcementReactions by viewModel.announcementReactions.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
@@ -54,14 +56,14 @@ fun HomeScreen(
                         Text(text = strings.todaysMeal, style = MaterialTheme.typography.titleLarge, color = Saffron)
                         Spacer(modifier = Modifier.height(8.dp))
                         if (latestMeal!!.photoUrl.isNotEmpty()) {
-                            NetworkImage(
-                                url = latestMeal!!.photoUrl,
-                                modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(8.dp))
-                            )
+                            NetworkImage(url = latestMeal!!.photoUrl,
+                                modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(8.dp)))
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        Text(text = latestMeal!!.menuDescription, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(text = latestMeal!!.uploadDate, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = latestMeal!!.menuDescription, style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = latestMeal!!.uploadDate, style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -99,19 +101,13 @@ fun HomeScreen(
             }
             items(count = announcements.size) { idx ->
                 val ann = announcements[idx]
-                ShaleCard {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = ann.title, style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-                        if (ann.description.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = ann.description, style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Text(text = ann.postedDate, style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
+                val reaction = announcementReactions[ann.id] ?: AnnouncementReactionSummary()
+                AnnouncementCard(
+                    announcement = ann,
+                    reaction = reaction,
+                    strings = strings,
+                    onReact = { vote -> viewModel.reactToAnnouncement(ann.id, vote) }
+                )
             }
         }
 
@@ -120,11 +116,63 @@ fun HomeScreen(
 }
 
 @Composable
+private fun AnnouncementCard(
+    announcement: Announcement,
+    reaction: AnnouncementReactionSummary,
+    strings: AppStrings,
+    onReact: (String) -> Unit
+) {
+    val reactionDefs = listOf(
+        Triple("like", strings.reactionLike, reaction.likes),
+        Triple("laugh", strings.reactionLaugh, reaction.laughs),
+        Triple("sad", strings.reactionSad, reaction.sads),
+        Triple("check", strings.reactionCheck, reaction.checks)
+    )
+
+    ShaleCard {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = announcement.title, style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            if (announcement.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = announcement.description, style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (announcement.imageUrl.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                NetworkImage(url = announcement.imageUrl,
+                    modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(8.dp)))
+            }
+            Text(text = announcement.postedDate, style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                reactionDefs.forEach { (type, emoji, count) ->
+                    val isSelected = reaction.myVote == type
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onReact(type) },
+                        label = {
+                            Text(if (count > 0) "$emoji $count" else emoji,
+                                style = MaterialTheme.typography.labelMedium)
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Saffron.copy(alpha = 0.15f),
+                            selectedLabelColor = Saffron
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun WelcomeBanner(strings: AppStrings) {
-    Box(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
-            .background(Brush.horizontalGradient(listOf(Saffron, SaffronDark))).padding(20.dp)
-    ) {
+    Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+        .background(Brush.horizontalGradient(listOf(Saffron, SaffronDark))).padding(20.dp)) {
         Column {
             Text(text = strings.welcomeTitle,
                 style = MaterialTheme.typography.headlineLarge.copy(color = PureWhite, fontWeight = FontWeight.Bold))
@@ -152,17 +200,15 @@ private fun QuickAccessGrid(strings: AppStrings, onNavigate: (Screen) -> Unit) {
 
 @Composable
 private fun QuickAccessCard(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Card(
-        modifier = modifier.aspectRatio(1f).clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
+    Card(modifier = modifier.aspectRatio(1f).clickable(onClick = onClick), shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
+        elevation = CardDefaults.cardElevation(2.dp)) {
         Column(modifier = Modifier.fillMaxSize().padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Icon(imageVector = icon, contentDescription = label, tint = Saffron, modifier = Modifier.size(28.dp))
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+            Text(text = label, style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
         }
     }
 }

@@ -84,6 +84,21 @@ data class AppStrings(
     val darkMode: String,
     val likes: String,
     val tapToView: String,
+    // Achievement comments
+    val comments: String,
+    val addComment: String,
+    val noComments: String,
+    val typeComment: String,
+    val profilePhoto: String,
+    val achievementPhoto: String,
+    // Announcement reactions
+    val reactionLike: String,
+    val reactionLaugh: String,
+    val reactionSad: String,
+    val reactionCheck: String,
+    // School info
+    val website: String,
+    val visitWebsite: String,
 )
 
 val EnglishStrings = AppStrings(
@@ -168,6 +183,18 @@ val EnglishStrings = AppStrings(
     darkMode = "Dark Mode",
     likes = "Likes",
     tapToView = "Tap to view full screen",
+    comments = "Comments",
+    addComment = "Add Comment",
+    noComments = "No comments yet. Be the first!",
+    typeComment = "Write a comment...",
+    profilePhoto = "Profile Photo",
+    achievementPhoto = "Achievement Photo (Optional)",
+    reactionLike = "👍",
+    reactionLaugh = "😂",
+    reactionSad = "😢",
+    reactionCheck = "✅",
+    website = "Website",
+    visitWebsite = "Visit School Website",
 )
 
 val KannadaStrings = AppStrings(
@@ -252,4 +279,16 @@ val KannadaStrings = AppStrings(
     darkMode = "ಡಾರ್ಕ್ ಮೋಡ್",
     likes = "ಇಷ್ಟಗಳು",
     tapToView = "ಪೂರ್ಣ ಪರದೆಯಲ್ಲಿ ನೋಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ",
+    comments = "ಕಾಮೆಂಟ್‌ಗಳು",
+    addComment = "ಕಾಮೆಂಟ್ ಸೇರಿಸಿ",
+    noComments = "ಇನ್ನೂ ಕಾಮೆಂಟ್‌ಗಳಿಲ್ಲ",
+    typeComment = "ಕಾಮೆಂಟ್ ಬರೆಯಿರಿ...",
+    profilePhoto = "ಪ್ರೊಫೈಲ್ ಫೋಟೋ",
+    achievementPhoto = "ಸಾಧನೆ ಫೋಟೋ (ಐಚ್ಛಿಕ)",
+    reactionLike = "👍",
+    reactionLaugh = "😂",
+    reactionSad = "😢",
+    reactionCheck = "✅",
+    website = "ವೆಬ್‌ಸೈಟ್",
+    visitWebsite = "ಶಾಲೆ ವೆಬ್‌ಸೈಟ್ ಭೇಟಿ ಮಾಡಿ",
 )

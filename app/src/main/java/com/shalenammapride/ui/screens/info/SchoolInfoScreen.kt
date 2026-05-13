@@ -132,6 +132,33 @@ fun SchoolInfoScreen(strings: AppStrings) {
             }
         }
 
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.vves.org")))
+                },
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(40.dp).clip(CircleShape).background(SaffronLight),
+                        contentAlignment = Alignment.Center) {
+                        Icon(Icons.Filled.Language, contentDescription = null, tint = Saffron, modifier = Modifier.size(22.dp))
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(text = strings.website, style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = "www.vves.org", style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold, color = Saffron)
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 

@@ -1,8 +1,9 @@
-﻿package com.shalenammapride.data.model
+package com.shalenammapride.data.model
 
 data class Announcement(
     val id: String = "",
     val title: String = "",
     val description: String = "",
+    val imageUrl: String = "",
     val postedDate: String = ""
 )
