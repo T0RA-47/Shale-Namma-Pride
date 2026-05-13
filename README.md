@@ -41,12 +41,12 @@ A modern Android app built for **Vijayanagara Vivekananda Education Society**, B
   </tr>
   <tr>
     <td align="center"><b>Admin Login</b></td>
-    <td></td>
+    <td align="center"><b>Home (Kannada)</b></td>
     <td></td>
   </tr>
   <tr>
     <td><img src="screenshots/admin_login.png" width="220"/></td>
-    <td></td>
+    <td><img src="screenshots/home_kannada.png" width="220"/></td>
     <td></td>
   </tr>
 </table>
